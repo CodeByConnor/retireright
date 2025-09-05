@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useSearchParams } from 'next/navigation'
 import { Calculator, Info, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -34,11 +33,10 @@ interface CalculatorFormProps {
 export function CalculatorForm({ onResult, className }: CalculatorFormProps) {
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
-  const searchParams = useSearchParams()
 
-  // Get values from URL parameters
-  const getInitialValues = (): Partial<CalculatorInput> => {
-    const urlParams: Partial<CalculatorInput> = {
+  const form = useForm<CalculatorInput>({
+    resolver: zodResolver(calculatorInputSchema),
+    defaultValues: {
       filingEntity: FilingEntity.SOLE_PROP,
       state: 'CA',
       age: 35,
@@ -51,36 +49,36 @@ export function CalculatorForm({ onResult, className }: CalculatorFormProps) {
       w2Wages: 0,
       businessProfit: 0
     }
+  })
 
-    // Override with URL parameters if present
-    if (searchParams.get('entity')) {
-      urlParams.filingEntity = searchParams.get('entity') as any
-    }
-    if (searchParams.get('age')) {
-      urlParams.age = parseInt(searchParams.get('age') || '35')
-    }
-    if (searchParams.get('state')) {
-      urlParams.state = searchParams.get('state') || 'CA'
-    }
-    if (searchParams.get('income')) {
-      const income = parseInt(searchParams.get('income') || '0')
-      if (urlParams.filingEntity === FilingEntity.SOLE_PROP) {
-        urlParams.netProfit = income
-      } else {
-        urlParams.w2Wages = income
+  // Handle URL parameters on client side only
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      
+      if (urlParams.get('entity')) {
+        form.setValue('filingEntity', urlParams.get('entity') as any)
+      }
+      if (urlParams.get('age')) {
+        form.setValue('age', parseInt(urlParams.get('age') || '35'))
+      }
+      if (urlParams.get('state')) {
+        form.setValue('state', urlParams.get('state') || 'CA')
+      }
+      if (urlParams.get('income')) {
+        const income = parseInt(urlParams.get('income') || '0')
+        const entity = urlParams.get('entity') || form.getValues('filingEntity')
+        if (entity === FilingEntity.SOLE_PROP) {
+          form.setValue('netProfit', income)
+        } else {
+          form.setValue('w2Wages', income)
+        }
+      }
+      if (urlParams.get('type')) {
+        form.setValue('contributionType', urlParams.get('type') as any)
       }
     }
-    if (searchParams.get('type')) {
-      urlParams.contributionType = searchParams.get('type') as any
-    }
-
-    return urlParams
-  }
-
-  const form = useForm<CalculatorInput>({
-    resolver: zodResolver(calculatorInputSchema),
-    defaultValues: getInitialValues()
-  })
+  }, [form])
 
   const watchedValues = form.watch()
   const { filingEntity, age, contributionType } = watchedValues
