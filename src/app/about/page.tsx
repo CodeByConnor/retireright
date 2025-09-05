@@ -19,8 +19,8 @@ export default function AboutPage() {
               <span className="font-semibold text-foreground">{siteConfig.name}</span>
             </div>
             
-            <Button asChild variant="outline">
-              <Link href="/" className="flex items-center">
+            <Button asChild variant="outline" className="group">
+              <Link href="/" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4 transition-all duration-300 ease-out group-hover:-translate-x-2 group-hover:scale-110" />
                 <span>Back to Calculator</span>
               </Link>
@@ -68,25 +68,26 @@ export default function AboutPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                This tool was created by <strong>Connor Pham</strong> to help self-employed folks explore 
-                retirement contribution options.
+                This tool was created by <strong>Connor Pham</strong>, a Computer Science student with a 
+                Finance minor, to help self-employed professionals explore retirement contribution options.
               </p>
               <p className="text-muted-foreground mb-6">
-                As someone who has navigated the complexities of self-employed retirement planning, Connor 
-                understands the importance of having reliable, easy-to-use tools for financial planning.
+                As a student passionate about fintech and solving financial problems with technology, Connor 
+                built this calculator to bridge the gap between complex tax regulations and user-friendly 
+                financial planning tools.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button asChild variant="outline" size="sm">
-                  <a href={siteConfig.links.email}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Contact
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button asChild variant="outline" className="group px-6 py-3">
+                  <a href={siteConfig.links.email} className="flex items-center gap-3">
+                    <Mail className="h-5 w-5 transition-all duration-300 ease-out group-hover:scale-110" />
+                    <span className="font-medium">Contact Connor</span>
                   </a>
                 </Button>
-                <Button asChild variant="outline" size="sm">
-                  <a href={siteConfig.links.github} target="_blank" rel="noopener noreferrer">
-                    <Github className="mr-2 h-4 w-4" />
-                    View Source
+                <Button asChild variant="outline" className="group px-6 py-3">
+                  <a href={siteConfig.links.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                    <Github className="h-5 w-5 transition-all duration-300 ease-out group-hover:scale-110 group-hover:rotate-12" />
+                    <span className="font-medium">View Source Code</span>
                   </a>
                 </Button>
               </div>
@@ -179,8 +180,8 @@ export default function AboutPage() {
 
         {/* CTA */}
         <div className="text-center mt-8">
-          <Button asChild size="lg">
-            <Link href="/" className="flex items-center">
+          <Button asChild size="lg" className="group">
+            <Link href="/" className="flex items-center gap-3">
               <Calculator className="h-5 w-5 transition-all duration-300 ease-out group-hover:rotate-12 group-hover:scale-110" />
               <span>Try the Calculator</span>
             </Link>

@@ -20,8 +20,8 @@ export default function LearnPage() {
               <span className="font-semibold text-foreground">{siteConfig.name}</span>
             </div>
             
-            <Button asChild variant="outline">
-              <Link href="/" className="flex items-center">
+            <Button asChild variant="outline" className="group">
+              <Link href="/" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4 transition-all duration-300 ease-out group-hover:-translate-x-2 group-hover:scale-110" />
                 <span>Back to Calculator</span>
               </Link>
@@ -186,8 +186,8 @@ export default function LearnPage() {
 
         {/* CTA */}
         <div className="text-center mt-8">
-          <Button asChild size="lg">
-            <Link href="/" className="flex items-center">
+          <Button asChild size="lg" className="group">
+            <Link href="/" className="flex items-center gap-3">
               <Calculator className="h-5 w-5 transition-all duration-300 ease-out group-hover:rotate-12 group-hover:scale-110" />
               <span>Try the Calculator</span>
             </Link>

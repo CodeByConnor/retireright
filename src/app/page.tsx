@@ -63,8 +63,8 @@ export default function HomePage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild size="lg">
-              <Link href="#calculator" className="flex items-center">
+            <Button asChild size="lg" className="group">
+              <Link href="#calculator" className="flex items-center gap-3">
                 <span>Get Started</span>
                 <ArrowRight className="h-5 w-5 transition-all duration-300 ease-out group-hover:translate-x-2 group-hover:scale-110" />
               </Link>

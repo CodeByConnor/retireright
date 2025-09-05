@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useSearchParams } from 'next/navigation'
 import { Calculator, Info, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -33,10 +34,11 @@ interface CalculatorFormProps {
 export function CalculatorForm({ onResult, className }: CalculatorFormProps) {
   const [isLoading, setIsLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const searchParams = useSearchParams()
 
-  const form = useForm<CalculatorInput>({
-    resolver: zodResolver(calculatorInputSchema),
-    defaultValues: {
+  // Get values from URL parameters
+  const getInitialValues = (): Partial<CalculatorInput> => {
+    const urlParams: Partial<CalculatorInput> = {
       filingEntity: FilingEntity.SOLE_PROP,
       state: 'CA',
       age: 35,
@@ -49,6 +51,35 @@ export function CalculatorForm({ onResult, className }: CalculatorFormProps) {
       w2Wages: 0,
       businessProfit: 0
     }
+
+    // Override with URL parameters if present
+    if (searchParams.get('entity')) {
+      urlParams.filingEntity = searchParams.get('entity') as any
+    }
+    if (searchParams.get('age')) {
+      urlParams.age = parseInt(searchParams.get('age') || '35')
+    }
+    if (searchParams.get('state')) {
+      urlParams.state = searchParams.get('state') || 'CA'
+    }
+    if (searchParams.get('income')) {
+      const income = parseInt(searchParams.get('income') || '0')
+      if (urlParams.filingEntity === FilingEntity.SOLE_PROP) {
+        urlParams.netProfit = income
+      } else {
+        urlParams.w2Wages = income
+      }
+    }
+    if (searchParams.get('type')) {
+      urlParams.contributionType = searchParams.get('type') as any
+    }
+
+    return urlParams
+  }
+
+  const form = useForm<CalculatorInput>({
+    resolver: zodResolver(calculatorInputSchema),
+    defaultValues: getInitialValues()
   })
 
   const watchedValues = form.watch()
