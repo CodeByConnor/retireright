@@ -14,8 +14,8 @@ export const siteConfig = {
     "RetireRight"
   ],
   links: {
-    github: "https://github.com/connorpham/retireright",
-    email: "mailto:connor@example.com"
+    github: "https://github.com/CodeByConnor/retireright",
+    email: "mailto:cpham2870@sdsu.edu"
   }
 } as const;
 

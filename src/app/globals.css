@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* Custom theme colors inspired by financial tools */
-  --primary: #18B65D;
-  --primary-dark: #0F8E49;
-  --accent: #10A6C2;
+  /* Custom theme colors inspired by Intuit products (TurboTax, QuickBooks) */
+  --primary: #0077C5;
+  --primary-dark: #005A94;
+  --accent: #00A4BD;
   --neutral-ink: #0F172A;
   --neutral-muted: #64748B;
-  --surface: #F7FAF9;
+  --surface: #F8FAFC;
   --white: #FFFFFF;
   
   /* Base colors */

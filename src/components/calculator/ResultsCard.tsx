@@ -1,14 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { TrendingUp, DollarSign, PiggyBank, AlertCircle, Download, Share2 } from 'lucide-react'
+import { BarChart3, Banknote, Wallet, AlertTriangle, FileDown, Link2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Accordion, AccordionItem } from '@/components/ui/accordion'
 
 import type { CalculationResult } from '@/lib/types'
-import { formatCurrency, formatPercentage, downloadData, generateShareableUrl } from '@/lib/utils'
+import { formatCurrency, formatPercentage, generateShareableUrl } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
 interface ResultsCardProps {
@@ -20,9 +20,17 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
   const { contributions, taxSavings, limits, flags, notes, warnings } = result
 
   const handleDownload = () => {
-    const downloadData = {
+    const downloadDataObj = {
       calculationDate: new Date().toISOString(),
-      input: result.input,
+      calculator: 'RetireRight',
+      input: {
+        businessStructure: result.input.filingEntity,
+        state: result.input.state,
+        age: result.input.age,
+        income: result.input.netProfit || result.input.w2Wages || 0,
+        contributionType: result.input.contributionType,
+        marginalTaxRate: result.input.marginalTaxRate
+      },
       results: {
         employeeContribution: contributions.employeeDeferral,
         employerContribution: contributions.employerContribution,
@@ -34,13 +42,25 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
       },
       limits,
       notes,
-      warnings
+      warnings,
+      disclaimer: 'These are planning estimates only and should not be considered as tax or legal advice. Consult with a qualified CPA or financial advisor before making contribution decisions.'
     }
 
-    downloadData(downloadData, `retirement-calculation-${new Date().toISOString().split('T')[0]}.json`)
+    // Create and download the file
+    const content = JSON.stringify(downloadDataObj, null, 2)
+    const blob = new Blob([content], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `retireright-calculation-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const shareParams = {
       entity: result.input.filingEntity,
       age: result.input.age,
@@ -50,8 +70,21 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
     }
 
     const shareUrl = generateShareableUrl(shareParams)
-    navigator.clipboard.writeText(shareUrl)
-    // You could add a toast notification here
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      // Show success feedback
+      alert('Calculation link copied to clipboard! Share it with others to show your retirement contribution strategy.')
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = shareUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      alert('Calculation link copied to clipboard!')
+    }
   }
 
   return (
@@ -60,7 +93,7 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
       <Card className="shadow-lg border-primary/20">
         <CardHeader className="pb-6">
           <CardTitle className="flex items-center gap-2 text-xl">
-            <TrendingUp className="h-6 w-6 text-primary" />
+            <BarChart3 className="h-6 w-6 text-primary" />
             Your Optimal Contribution Strategy
           </CardTitle>
           <CardDescription>
@@ -74,7 +107,7 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
             {/* Employee Contribution */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-accent" />
+                <Banknote className="h-4 w-4 text-accent" />
                 <span className="text-sm font-medium">Employee Contribution</span>
               </div>
               <div className="text-2xl font-bold text-foreground">
@@ -96,7 +129,7 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
             {/* Employer Contribution */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <PiggyBank className="h-4 w-4 text-primary" />
+                <Wallet className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">Employer Contribution</span>
               </div>
               <div className="text-2xl font-bold text-foreground">
@@ -110,7 +143,7 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
             {/* Total Contribution */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
+                <BarChart3 className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">Total Annual Contribution</span>
               </div>
               <div className="text-2xl font-bold text-primary">
@@ -148,7 +181,7 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
           {(flags.hitElectiveDeferralLimit || flags.hit415cLimit || flags.hitCompensationLimit) && (
             <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200">
               <div className="flex items-center gap-2 text-amber-800 text-sm font-medium mb-1">
-                <AlertCircle className="h-4 w-4" />
+                <AlertTriangle className="h-4 w-4" />
                 Contribution Limits Reached
               </div>
               <div className="text-xs text-amber-700 space-y-1">
@@ -170,11 +203,11 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Button onClick={handleDownload} variant="outline" className="flex-1">
-          <Download className="h-4 w-4 transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:scale-110" />
+          <FileDown className="h-4 w-4 transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:scale-110" />
           <span>Download Results</span>
         </Button>
         <Button onClick={handleShare} variant="outline" className="flex-1">
-          <Share2 className="h-4 w-4 transition-all duration-300 ease-out group-hover:rotate-12 group-hover:scale-110" />
+          <Link2 className="h-4 w-4 transition-all duration-300 ease-out group-hover:rotate-12 group-hover:scale-110" />
           <span>Share Calculation</span>
         </Button>
       </div>
@@ -224,7 +257,7 @@ export function ResultsCard({ result, className }: ResultsCardProps) {
             <ul className="space-y-1 text-sm text-amber-700">
               {warnings.map((warning, index) => (
                 <li key={index} className="flex items-start gap-2">
-                  <AlertCircle className="h-4 w-4 mt-0.5 text-amber-500" />
+                  <AlertTriangle className="h-4 w-4 mt-0.5 text-amber-500" />
                   <span>{warning}</span>
                 </li>
               ))}
